@@ -1,0 +1,647 @@
+{
+	"info": {
+		"_postman_id": "29eb4cb8-76f5-470c-bbe9-107a59b12340",
+		"name": "Leadmarket",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13675750"
+	},
+	"item": [
+		{
+			"name": "workspace",
+			"item": [
+				{
+					"name": "invite user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.text().includes(\"Invitation email sent successfully.\")) {\r",
+									"    \r",
+									"    var requestBody = pm.request.body.raw; \r",
+									"    var jsonData = JSON.parse(requestBody);\r",
+									"\r",
+									"    pm.collectionVariables.set(\"user_email\", jsonData.email);\r",
+									"    pm.collectionVariables.set(\"user_fullname\", jsonData.name);\r",
+									"}\r",
+									" else {\r",
+									"\r",
+									"    console.log(\"Invite was not sent\");\r",
+									" }\r",
+									"\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"\r",
+									"    pm.test(\"Invitation email sent successfully\", function () {\r",
+									"        pm.expect(pm.response.text()).to.include(\"Invitation email sent successfully.\");\r",
+									"    });\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"name\": \"{{$randomFullName}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/invite_user/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"invite_user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "workspace list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"var targetUserEmail = pm.collectionVariables.get(\"user_email\").toLowerCase();\r",
+									"var expectedFirstName = pm.collectionVariables.get(\"user_fullname\");\r",
+									"\r",
+									"var targetUser = jsonData.find(function (user) {\r",
+									"    return user.email === targetUserEmail;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User with email \" + targetUserEmail + \" exists\", function () {\r",
+									"    pm.expect(targetUser).to.not.be.undefined;\r",
+									"    pm.expect(targetUser).to.be.an('object');\r",
+									"     pm.collectionVariables.set(\"user_id\", targetUser.id);\r",
+									"});\r",
+									"\r",
+									"if (targetUser && expectedFirstName) {\r",
+									"    pm.test(\"User's first name is correct\", function () {\r",
+									"        pm.expect(targetUser.first_name).to.eql(expectedFirstName);\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/workspace_list/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"workspace_list",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "block user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/workspace_list/delete/{{user_id}}/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"workspace_list",
+								"delete",
+								"{{user_id}}",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reactivate user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"User reactivated\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"User has been successfully reactivated.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/user/workspace_list/reactivate/{{user_id}}/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"user",
+								"workspace_list",
+								"reactivate",
+								"{{user_id}}",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notifications",
+			"item": [
+				{
+					"name": "notification list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{apiUrl}}/search_requests/notifications_list",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"search_requests",
+								"notifications_list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read notification",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"read\" : \"true\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiUrl}}/search_requests/notifications_list/3d75e086-d362-4a29-9c20-c743d8066393/",
+							"host": [
+								"{{apiUrl}}"
+							],
+							"path": [
+								"search_requests",
+								"notifications_list",
+								"3d75e086-d362-4a29-9c20-c743d8066393",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"kyrylo_d@dataforest.ai\",\r\n    \"password\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/auth/token/",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"auth",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reset password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"kyrylo_d@dataforest.ai\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/auth/forgot-password/",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"auth",
+						"forgot-password",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set new password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.text()){\r",
+							"    const response = pm.response.json()\r",
+							"    if (response.access != null){\r",
+							"        pm.collectionVariables.set(\"password\", response.access);\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT {{jwt_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"new_password\":\t\"NDw*64voT!ZegMkd\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/user/set_password/",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"user",
+						"set_password",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201 Created\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"       pm.response.to.have.status(\"Created\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT {{jwt_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"source\": \"yellowpages\",\r\n    \"category\": \"Abbey\",\r\n    \"location\": \"Addison\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/search_requests/",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"search_requests",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "plan update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "JWT {{jwt_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \t\r\n\"period\":\t\"annual\",\r\n\"plan_id\":\t\"9212c20d-d318-4fe7-98f5-4e4842429974\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiUrl}}/plans/update/",
+					"host": [
+						"{{apiUrl}}"
+					],
+					"path": [
+						"plans",
+						"update",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "JWT {{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"if (pm.response.text()){\r",
+					"    const response = pm.response.json()\r",
+					"    if (response.access != null){\r",
+					"        pm.collectionVariables.set(\"jwt_token\", response.access);\r",
+					"    }\r",
+					"}\r",
+					"\r",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "apiUrl",
+			"value": "https://app.leadmarket.ai/api",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "password_set_success",
+			"value": ""
+		},
+		{
+			"key": "user_email",
+			"value": ""
+		},
+		{
+			"key": "user_fullname",
+			"value": ""
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "first_name",
+			"value": ""
+		}
+	]
+}
